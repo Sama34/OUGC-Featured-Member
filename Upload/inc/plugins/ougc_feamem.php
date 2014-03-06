@@ -89,7 +89,7 @@ function ougc_feamem_info()
 		'website'		=> 'http://community.mybb.com/user-25096.html',
 		'author'		=> 'Omar G.',
 		'authorsite'	=> 'http://community.mybb.com/user-25096.html',
-		'version'		=> '1.0',
+		'version'		=> '1.1',
 		'guid'			=> '',
 		'compatibility' => '16*',
 		'plv'			=> 11
@@ -147,8 +147,88 @@ function ougc_feamem_activate()
 			'optionscode'	=> 'text',
 			'value'			=> '40x40',
 		),
-	));
+		'ignorefeatured'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_ignorefeatured,
+			'description'	=> $lang->setting_ougc_feamem_ignorefeatured_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=> 1,
+		),
+		'ignoredhistory'	=> array(
+			'title'			=> 'Ignored History',
+			'description'	=> 'Edit this under your own risk',
+			'optionscode'	=> 'textarea',
+			'value'			=> '',
+		),
+		'createthread'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_createthread,
+			'description'	=> $lang->setting_ougc_feamem_createthread_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=> 0,
+		),
+		'thread_fid'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_fid,
+			'description'	=> $lang->setting_ougc_feamem_thread_fid_desc,
+			'optionscode'	=> 'text',
+			'value'			=> '',
+		),
+		'thread_subject'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_subject,
+			'description'	=> $lang->setting_ougc_feamem_thread_subject_desc,
+			'optionscode'	=> 'text',
+			'value'			=> 'Congralutations {USERNAME}, for being member of the month. ({DATE})',
+		),
+		'thread_message'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_message,
+			'description'	=> $lang->setting_ougc_feamem_thread_message_desc,
+			'optionscode'	=> 'textarea',
+			'value'			=> 'Congralutations {USERNAME}, for being member of the month.
 
+All users, please congraludate our new member of the month as well :)',
+		),
+		'thread_prefix'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_prefix,
+			'description'	=> $lang->setting_ougc_feamem_thread_prefix_desc,
+			'optionscode'	=> 'text',
+			'value'			=> '',
+		),
+		'thread_icon'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_,
+			'description'	=> $lang->setting_ougc_feamem_thread_icon_desc,
+			'optionscode'	=> 'text',
+			'value'			=> '',
+		),
+		'thread_uid'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_uid,
+			'description'	=> $lang->setting_ougc_feamem_thread_uid_desc,
+			'optionscode'	=> 'text',
+			'value'			=> '',
+		),
+		'thread_closed'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_closed,
+			'description'	=> $lang->setting_ougc_feamem_thread_closed_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=> 0,
+		),
+		'thread_sticky'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_sticky,
+			'description'	=> $lang->setting_ougc_feamem_thread_sticky_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=> 0,
+		),
+		//CREATE POST
+		/*'thread_sticky_time'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_sticky_time,
+			'description'	=> $lang->setting_ougc_feamem_thread_sticky_time_desc,
+			'optionscode'	=> '',
+			'value'			=> '',
+		),
+		'thread_visible'	=> array(
+			'title'			=> $lang->setting_ougc_feamem_thread_visible,
+			'description'	=> $lang->setting_ougc_feamem_thread_visible_desc,
+			'optionscode'	=> '',
+			'value'			=> '',
+		),*/
+	));
 	// Insert template/group
 	$PL->templates('ougcfeamem', '<lang:ougc_feamem>', array(
 		''	=> '<div style="float: right;">
@@ -275,7 +355,7 @@ function ougc_feamem(&$page)
 			eval('$hours = (int)('.$vrts.');');
 		}
 
-		if(empty($user) || empty($data['time']) || $data['time'] <= $hourstime or true) // DEBUG
+		if(empty($user) || empty($data['time']) || $data['time'] <= $hourstime)
 		{
 			global $db;
 
@@ -336,7 +416,15 @@ function ougc_feamem(&$page)
 				{
 					$where .= $and.'away=\'0\'';
 				}
-	
+
+				if($mybb->settings['ougc_feamem_ignorefeatured'] && $mybb->settings['ougc_feamem_ignoredhistory'])
+				{
+					$uids = explode(',', $mybb->settings['ougc_feamem_ignoredhistory']);
+					$uids = implode('\',\'', array_filter(array_unique(array_map('intval', $uids))));
+					$where .= $and.'uid NOT IN (\''.$uids.'\')';
+					$uids = array();
+				}
+
 				$query = $db->simple_select('users', 'uid', $where);
 				while($uid = $db->fetch_field($query, 'uid'))
 				{
@@ -358,7 +446,25 @@ function ougc_feamem(&$page)
 
 			ougc_feamem_clean($user);
 
+			// Create a thread
+			$data['tid'] = ougc_feamem_create_thread(array(
+				'uid'		=> $user['uid'],
+				'username'	=> $user['username']
+			), $data['errors']);
+
 			$data['time'] = TIME_NOW;
+
+			// ignore already featured memebers
+			if($mybb->settings['ougc_feamem_ignorefeatured'])
+			{
+				$uids = explode(',', $mybb->settings['ougc_feamem_ignoredhistory']);
+				$uids[] = $user['uid'];
+				$uids = implode(',', array_filter(array_unique(array_map('intval', $uids))));
+				$uids = $db->escape_string($uids);
+				$db->update_query('settings', array('value'	=> $uids), 'name=\'ougc_feamem_ignoredhistory\'');
+				rebuild_settings();
+			}
+
 			$mybb->cache->update('ougc_feamem', $data);
 		}
 
@@ -722,12 +828,62 @@ function ougc_feamem_clean(&$user)
 
 function ougc_feamem_formcontainer_output_row(&$args)
 {
+	global $form, $settings, $lang;
+	ougc_feamem_load_lang();
+
+	#static $unset_prefix = false;
+
 	if($args['row_options']['id'] == 'row_setting_ougc_feamem_groups')
 	{
-		global $form, $settings, $lang;
-		ougc_feamem_load_lang();
-
 		$args['content'] = $form->generate_group_select('ougc_feamem_groups[]', explode(',', $settings['ougc_feamem_groups']), array('multiple' => true, 'size' => 5));
+	}
+
+	if($args['row_options']['id'] == 'row_setting_ougc_feamem_ignoredhistory')
+	{
+		$args['row_options']['id'] .= '" style="display: none;';
+	}
+
+	if($args['row_options']['id'] == 'row_setting_ougc_feamem_thread_fid')
+	{
+		$args['content'] = $form->generate_forum_select('upsetting[ougc_feamem_thread_fid]', (int)$settings['ougc_feamem_thread_fid']);
+	}
+
+	if($args['row_options']['id'] == 'row_setting_ougc_feamem_thread_prefix')
+	{
+		$args['content'] = build_prefix_select('all', (int)$settings['ougc_feamem_thread_prefix']); // FID should probably be updated via ajax or jQ
+
+		if($args['content'] === false)
+		{
+			$args['content'] = $lang->setting_ougc_feamem_thread_prefix_empty;
+		}
+		else
+		{
+			$args['content'] = str_replace('name="threadprefix"', 'name="upsetting[ougc_feamem_thread_prefix]"', $args['content']);
+		}
+
+		/*if($args['content'] === false)
+		{
+			// No prefixes
+			control_object($args['this'], '
+				function construct_cell($data, $extra=array())
+				{
+					_dump(true, $data, $extra);
+					$this->_cells[] = array("data" => $data, "extra" => $extra);
+				}
+			');
+			#$args['content']['skip_construct'] = $unset_prefix = true;
+			#return ' return "";';
+		}*/
+	}
+
+	if($args['row_options']['id'] == 'row_setting_ougc_feamem_thread_icon')
+	{
+		global $templates;
+
+		$mybb->input['icon'] = (int)$settings['ougc_feamem_thread_icon'];
+
+		$templates->cache['posticons'] = '{$iconlist}';
+		$args['content'] = str_replace(array('src="images', 'name="icon"'), array('src="../images', 'name="upsetting[ougc_feamem_thread_icon]"'), get_post_icons());
 	}
 }
 
@@ -736,6 +892,197 @@ function ougc_feamem_output_submit_wrapper(&$args)
 	global $page, $form;
 
 	$args[0] = $form->generate_submit_button('Reset User', array('name' => 'ougc_feamem_reset')).$args[0];
+
+	echo '<script type="text/javascript">
+	Event.observe(window, "load", function() {
+		Load_OUGC_Feamem_Peekers();			
+	});
+
+	function Load_OUGC_Feamem_Peekers()
+	{
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_fid"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_subject"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_message"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_prefix"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_icon"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_uid"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_closed"), /1/, true);
+		new Peeker($$(".setting_ougc_feamem_createthread"), $("row_setting_ougc_feamem_thread_sticky"), /1/, true);
+	}
+</script>';
+}
+
+// Create a thread by administrator settings
+function ougc_feamem_create_thread($user, $errors=array(), $tid=0)
+{
+	global $settings;
+
+	if(!is_array($errors))
+	{
+		$errors = array();
+	}
+
+	$sets = array(
+		'fid'		=> (int)$settings['ougc_feamem_thread_fid'],
+		'subject'	=> trim($settings['ougc_feamem_thread_subject']),
+		'message'	=> trim($settings['ougc_feamem_thread_message']),
+		'prefix'	=> (int)$settings['ougc_feamem_thread_prefix'],
+		'icon'		=> (int)$settings['ougc_feamem_thread_icon'],
+		'uid'		=> (int)$settings['ougc_feamem_thread_uid'],
+		'closed'	=> (int)(bool)$settings['ougc_feamem_thread_closed'],
+		'sticky'	=> (int)(bool)$settings['ougc_feamem_thread_sticky'],
+		'username'	=> '',
+	);
+
+	// Verify settings
+	$forum = get_forum($sets['fid']);
+	if(!(isset($forum['type']) && $forum['type'] == 'f'))
+	{
+		$errors[] = 'invalid_forum';
+		return false;
+	}
+	unset($forum);
+	if(empty($sets['subject']))
+	{
+		$errors[] = 'invalid_subject';
+		return false;
+	}
+	if(empty($sets['message']))
+	{
+		$errors[] = 'invalid_message';
+		return false;
+	}
+
+	if($sets['prefix'])
+	{
+		$prefix = build_prefixes($sets['prefix']);
+		if(empty($prefix['pid']))
+		{
+			$sets['prefix'] = 0;
+		}
+		unset($prefix);
+	}
+	if($sets['icon'])
+	{
+		global $cache;
+
+		$icons = $cache->read('posticons');
+		if(empty($icons[$sets['icon']]))
+		{
+			$sets['icon'] = 0;
+		}
+		unset($icons);
+	}
+
+	global $db;
+
+	// Get the corrct thread author UID and USERNAME
+	if(my_strpos($sets['uid'], 'username:') !== false)
+	{
+		$username = explode(':', $sets['uid']);
+		$username = $db->escape_string(my_strtolower($username[1]));
+		$query = $db->simple_select('users', 'uid, username', 'username=\''.$username.'\'');
+		$author = $db->fetch_array($query);
+		$sets['uid'] = $author['uid'];
+		$sets['username'] = $author['username'];
+
+		if(empty($sets['uid']))
+		{
+			$errors[] = 'invalid_thread_user';
+			return false;
+		}
+
+		unset($username, $author);
+	}
+
+	if($sets['uid'] == -1)
+	{
+		global $lang;
+
+		isset($lang->guest) or $lang->guest = 'Guest';
+		$sets['uid'] = 0;
+		$sets['username'] = $lang->guest;
+	}
+	elseif($sets['uid'] && !$sets['username'])
+	{
+		$query = $db->simple_select('users', 'username', 'uid=\''.(int)$sets['uid'].'\'');
+		$sets['username'] = (string)$db->fetch_field($query, 'username');
+		if(empty($sets['username']))
+		{
+			$errors[] = 'invalid_thread_user';
+			return false;
+		}
+	}
+	else
+	{
+		$sets['uid'] = $user['uid'];
+		$sets['username'] = $user['username'];
+	}
+
+	$date = my_date('Y-m-d', TIME_NOW);
+
+	$sets['subject'] = str_replace(array('{USERNAME}', '{DATE}'), array($user['username'], $date), $sets['subject']);
+	$sets['message'] = str_replace(array('{USERNAME}', '{DATE}'), array($user['username'], $date), $sets['message']);
+
+	// Set the thread data 
+	$threaddata = array(
+		'fid'		=> $sets['fid'],
+		'subject'	=> $sets['subject'],
+		'message'	=> $sets['message'],
+		'prefix'	=> $sets['prefix'],
+		'icon'		=> $sets['icon'],
+		'uid'		=> $sets['uid'],
+		'username'	=> $sets['username'],
+		'posthash'	=> md5($sets['uid'].mt_rand()),
+		'savedraft'	=> 0,
+		'options'	=> array(
+			'signature'				=> 1,
+			'subscriptionmethod'	=> '',
+			'disablesmilies'		=> 0
+		)
+	);
+
+	require_once MYBB_ROOT.'inc/datahandlers/post.php';
+	$posthandler = new PostDataHandler('insert');
+
+	$posthandler->action = 'thread';
+	$posthandler->admin_override = true;
+
+	$posthandler->set_data($threaddata);
+
+	if(!$posthandler->validate_thread())
+	{
+		$errors['posthandler'] = $posthandler->get_friendly_errors();
+		return false;
+	}
+
+	$thread = $posthandler->insert_thread();
+	$thread['tid'] = (int)$thread['tid'];
+
+	// Close / stick the thread
+	$updatedata = array();
+	if($sets['closed'])
+	{
+		$updatedata['closed'] = 1;
+	}
+	if($sets['sticky'])
+	{
+		$updatedata['sticky'] = 1;
+	}
+
+	if($updatedata)
+	{
+		$db->update_query('threads', $updatedata, 'tid=\''.$thread['tid'].'\'');
+	}
+
+	// Mark thread read if current user is the author
+	/*if($mybb->user['uid'] == $sets['uid'])
+	{
+		require_once MYBB_ROOT.'inc/functions_indicators.php';
+		mark_thread_read($thread['tid'], $sets['fid']);
+	}*/
+
+	return $thread['tid'];
 }
 
 // control_object by Zinga Burga from MyBBHacks ( mybbhacks.zingaburga.com ), 1.62

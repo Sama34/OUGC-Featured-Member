@@ -4,9 +4,9 @@
  *
  *   OUGC Featured Member plugin (/inc/plugins/ougc_feamem.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2012 Omar Gonzalez
+ *   Copyright: Â© 2012 - 2014 Omar Gonzalez
  *   
- *   Website: http://community.mybb.com/user-25096.html
+ *   Website: http://omarg.me
  *
  *   Shows a member information anywhere in the forum.
  *
@@ -89,8 +89,8 @@ function ougc_feamem_info()
 		'website'		=> 'http://omarg.me',
 		'author'		=> 'Omar G.',
 		'authorsite'	=> 'http://omarg.me',
-		'version'		=> '1.1',
-		'versioncode'	=> 1100,
+		'version'		=> '1.8',
+		'versioncode'	=> 1800,
 		'compatibility' => '18*',
 		'plv'			=> 12
 	);

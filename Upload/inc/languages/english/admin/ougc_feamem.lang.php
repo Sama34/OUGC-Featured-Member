@@ -4,9 +4,9 @@
  *
  *   OUGC Featured Member plugin (/inc/languages/english/admin/ougc_feamem.lang.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2012 Omar Gonzalez
+ *   Copyright: Â© 2012 - 2014 Omar Gonzalez
  *   
- *   Website: http://community.mybb.com/user-25096.html
+ *   Website: http://omarg.me
  *
  *   Shows a member information anywhere in the forum.
  *

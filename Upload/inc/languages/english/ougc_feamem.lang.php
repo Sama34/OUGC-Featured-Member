@@ -27,7 +27,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
-$l['ougc_feamem'] = 'OUGC Featured Member';
+// Plugin API
+$l['setting_group_ougc_feamem'] = 'OUGC Featured Member';
 
 $l['ougc_feamem_title'] = 'Featured Member';
 $l['ougc_feamem_none_registered'] = 'None Registered';

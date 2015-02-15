@@ -85,26 +85,26 @@ function ougc_feamem_info()
 
 	return array(
 		'name'			=> 'OUGC Featured Member',
-		'description'	=> $lang->ougc_feamem_d,
-		'website'		=> 'http://community.mybb.com/user-25096.html',
+		'description'	=> $lang->setting_group_ougc_feamem_desc,
+		'website'		=> 'http://omarg.me',
 		'author'		=> 'Omar G.',
-		'authorsite'	=> 'http://community.mybb.com/user-25096.html',
+		'authorsite'	=> 'http://omarg.me',
 		'version'		=> '1.1',
-		'guid'			=> '',
-		'compatibility' => '16*',
-		'plv'			=> 11
+		'versioncode'	=> 1100,
+		'compatibility' => '18*',
+		'plv'			=> 12
 	);
 }
 
 // _activate function
 function ougc_feamem_activate()
 {
-	global $lang, $PL;
+	global $lang, $PL, $cache;
 	ougc_feamem_load_pl();
 	ougc_feamem_deactivate();
 
 	// Add our settings
-	$PL->settings('ougc_feamem', 'OUGC Featured Member', $lang->setting_group_ougc_feamem_desc, array(
+	$PL->settings('ougc_feamem', $lang->setting_group_ougc_feamem, $lang->setting_group_ougc_feamem_desc, array(
 		'time'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_time,
 			'description'	=> $lang->setting_ougc_feamem_time_desc,
@@ -114,7 +114,7 @@ function ougc_feamem_activate()
 		'groups'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_groups,
 			'description'	=> $lang->setting_ougc_feamem_groups_desc,
-			'optionscode'	=> 'text',
+			'optionscode'	=> 'groupselect',
 			'value'			=> '',
 		),
 		'uid'	=> array(
@@ -127,19 +127,7 @@ function ougc_feamem_activate()
 			'title'			=> $lang->setting_ougc_feamem_away,
 			'description'	=> $lang->setting_ougc_feamem_away_desc,
 			'optionscode'	=> 'yesno',
-			'value'			=> 1,
-		),
-		'avatar'	=> array(
-			'title'			=> $lang->setting_ougc_feamem_avatar,
-			'description'	=> $lang->setting_ougc_feamem_avatar_desc,
-			'optionscode'	=> 'text',
-			'value'			=> $GLOBALS['settings']['bburl'].'/images/avatars/invalid_url.gif',
-		),
-		'avatardim'	=> array(
-			'title'			=> $lang->setting_ougc_feamem_avatardim,
-			'description'	=> $lang->setting_ougc_feamem_avatardim_desc,
-			'optionscode'	=> 'text',
-			'value'			=> '85|85',
+			'value'			=> 0,
 		),
 		'maxavatardim'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_maxavatardim,
@@ -175,15 +163,15 @@ function ougc_feamem_activate()
 			'title'			=> $lang->setting_ougc_feamem_thread_subject,
 			'description'	=> $lang->setting_ougc_feamem_thread_subject_desc,
 			'optionscode'	=> 'text',
-			'value'			=> 'Congralutations {USERNAME}, for being member of the month. ({DATE})',
+			'value'			=> 'Congralutations {USERNAME}, for being member of the day. ({DATE})',
 		),
 		'thread_message'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_thread_message,
 			'description'	=> $lang->setting_ougc_feamem_thread_message_desc,
 			'optionscode'	=> 'textarea',
-			'value'			=> 'Congralutations {USERNAME}, for being member of the month.
+			'value'			=> 'Congralutations {USERNAME}, for being member of the day.
 
-All users, please congraludate our new member of the month as well :)',
+All users, please congratulate our new member of the day as well :)',
 		),
 		'thread_prefix'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_thread_prefix,
@@ -230,9 +218,8 @@ All users, please congraludate our new member of the month as well :)',
 		),*/
 	));
 	// Insert template/group
-	$PL->templates('ougcfeamem', '<lang:ougc_feamem>', array(
-		''	=> '<div style="float: right;">
-<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
+	$PL->templates('ougcfeamem', '<lang:setting_group_ougc_feamem>', array(
+		''	=> '<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
 <tr>
 <td class="thead">
 <strong>{$lang->ougc_feamem_title}</strong>
@@ -244,9 +231,8 @@ All users, please congraludate our new member of the month as well :)',
 {$usertitle}{$groupimage}{$userstars}{$awards}
 </td>
 </tr>
-</table>
-</div>',
-		'avatar'	=> '<br /><a href="{$user[\'profilelink\']}" title="{$user[\'username\']}"><img src="{$avatar[\'image\']}" width="{$avatar[\'width\']}" height="{$avatar[\'height\']}" alt="{$user[\'username\']}" /></a>',
+</table><br />',
+		'avatar'	=> '<br /><a href="{$user[\'profilelink\']}" title="{$user[\'username\']}"><img src="{$avatar[\'image\']}" {$avatar[\'width_height\']} /></a>',
 		'awards_award'	=> '<img src="{$apkeys[\'path\']}{$award[\'image\']}" alt="{$award[\'name\']}" title="{$award[\'name\']}" />',
 		'awards'	=> '<br /><b>{$lang->ougc_feamem_awards}</b><br />{$awards}',
 		'groupimage'	=> '<br /><img src="{$displaygroup[\'image\']}" alt="{$usertitle}" title="{$usertitle}" />',
@@ -257,7 +243,28 @@ All users, please congraludate our new member of the month as well :)',
 	));
 
 	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
-	find_replace_templatesets('index', '#'.preg_quote('{$header}').'#i', '{$header}<!--OUGC_FEAMEM-->');
+	find_replace_templatesets('portal', '#'.preg_quote('{$welcome}').'#i', '{$welcome}<!--OUGC_FEAMEM-->');
+
+	// Insert/update version into cache
+	$plugins = $cache->read('ougc_plugins');
+	if(!$plugins)
+	{
+		$plugins = array();
+	}
+
+	$info = ougc_feamem_info();
+
+	if(!isset($plugins['feamem']))
+	{
+		$plugins['feamem'] = $info['versioncode'];
+	}
+
+	/*~*~* RUN UPDATES START *~*~*/
+
+	/*~*~* RUN UPDATES END *~*~*/
+
+	$plugins['feamem'] = $info['versioncode'];
+	$cache->update('ougc_plugins', $plugins);
 }
 
 // _deactivate function
@@ -265,6 +272,7 @@ function ougc_feamem_deactivate()
 {
 	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
 	find_replace_templatesets('index', '#'.preg_quote('<!--OUGC_FEAMEM-->').'#i', '', 0);
+	find_replace_templatesets('portal', '#'.preg_quote('<!--OUGC_FEAMEM-->').'#i', '', 0);
 }
 
 // _install function
@@ -288,11 +296,27 @@ function ougc_feamem_is_installed()
 function ougc_feamem_uninstall()
 {
 	global $db, $cache, $lang, $PL;
-	ougc_feamem_load_pl();
 
 	$PL->settings_delete('ougc_feamem');
 	$PL->templates_delete('ougcfeamem');
 	$PL->cache_delete('ougc_feamem');
+
+	// Delete version from cache
+	$plugins = (array)$cache->read('ougc_plugins');
+
+	if(isset($plugins['feamem']))
+	{
+		unset($plugins['feamem']);
+	}
+
+	if(!empty($plugins))
+	{
+		$cache->update('ougc_plugins', $plugins);
+	}
+	else
+	{
+		$PL->cache_delete('ougc_plugins');
+	}
 }
 
 // Loads language file
@@ -300,7 +324,7 @@ function ougc_feamem_load_lang()
 {
 	global $lang;
 
-	isset($lang->ougc_feamem) or $lang->load('ougc_feamem');
+	isset($lang->setting_group_ougc_feamem) or $lang->load('ougc_feamem');
 }
 
 // Load and check PluginLibrary
@@ -333,7 +357,7 @@ function ougc_feamem(&$page)
 {
 	global $mybb;
 
-	if(my_strpos($page, '<!--OUGC_FEAMEM-->'))
+	if(my_strpos($page, '<!--OUGC_FEAMEM-->') && $mybb->settings['ougc_feamem_groups'] != '')
 	{
 		global $mybb, $theme, $lang, $templates, $ougc_awards, $ougc_feamem_templs, $groupscache;
 		ougc_feamem_load_lang();
@@ -378,8 +402,8 @@ function ougc_feamem(&$page)
 			{
 				$uids = array();
 
-				$where = $and = '';
-				if(!empty($mybb->settings['ougc_feamem_groups']))
+				$where = array();
+				if($mybb->settings['ougc_feamem_groups'] != -1)
 				{
 					$gids = array_filter(array_unique(explode(',', $mybb->settings['ougc_feamem_groups'])));
 
@@ -393,39 +417,39 @@ function ougc_feamem(&$page)
 					}
 
 					$or = '';
-					$where .= '(';
+					$sql_where .= '(';
 					foreach((array)$gids as $gid)
 					{
 						$gid = (int)$gid;
-						$where .= $or.'usergroup=\''.$gid.'\' OR ';
+						$sql_where .= $or.'usergroup=\''.$gid.'\' OR ';
 						if($mysql)
 						{
-							$where .= 'CONCAT(\',\',additionalgroups,\',\') LIKE \'%,'.$gid.',%\'';
+							$sql_where .= 'CONCAT(\',\',additionalgroups,\',\') LIKE \'%,'.$gid.',%\'';
 						}
 						else
 						{
-							$where .= '\',\'||additionalgroups||\',\' LIKE \'%,'.$gid.',%\'';
+							$sql_where .= '\',\'||additionalgroups||\',\' LIKE \'%,'.$gid.',%\'';
 						}
 						$or = ' OR ';
 					}
-					$where .= ')';
-					$and = ' AND ';
+					$sql_where .= ')';
+					$where[] = $sql_where;
 				}
 
 				if(empty($mybb->settings['ougc_feamem_away']))
 				{
-					$where .= $and.'away=\'0\'';
+					$where[] = 'away=\'0\'';
 				}
 
 				if($mybb->settings['ougc_feamem_ignorefeatured'] && $mybb->settings['ougc_feamem_ignoredhistory'])
 				{
 					$uids = explode(',', $mybb->settings['ougc_feamem_ignoredhistory']);
 					$uids = implode('\',\'', array_filter(array_unique(array_map('intval', $uids))));
-					$where .= $and.'uid NOT IN (\''.$uids.'\')';
+					$where[] = 'uid NOT IN (\''.$uids.'\')';
 					$uids = array();
 				}
 
-				$query = $db->simple_select('users', 'uid', $where);
+				$query = $db->simple_select('users', 'uid', implode(' AND ', $where));
 				while($uid = $db->fetch_field($query, 'uid'))
 				{
 					$uids[(int)$uid] = (int)$uid;
@@ -484,6 +508,11 @@ function ougc_feamem(&$page)
 			$templates->cache(implode(',', (array)$ougc_feamem_templs));
 		}
 
+		$user['displaygroup'] or $user['displaygroup'] = $user['usergroup'];
+
+		$user['username'] = htmlspecialchars_uni($user['username']);
+		$user['profilelink'] = get_profile_link($user['uid']);
+
 		$profilelink = build_profile_link($user['username'], $user['uid']);
 		$username_formatted = format_name($user['username'], $user['usergroup'], $user['displaygroup']);
 		$profilelink_formatted = build_profile_link($username_formatted, $user['uid']);
@@ -492,25 +521,7 @@ function ougc_feamem(&$page)
 		$avatar = '';
 		if((bool)$mybb->user['showavatars'] || !$mybb->user['uid'])
 		{
-			$avatar['image'] = htmlspecialchars_uni($user['avatar']);
-			if(my_strpos($avatar['image'], 'http') === false)
-			{
-				$avatar['image'] = $mybb->settings['bburl'].'/'.$avatar['image'];
-			}
-
-			$dimensions = explode('|', $user['avatardimensions']);
-			if(isset($dimensions[0]) && isset($dimensions[1]))
-			{
-				list($maxwidth, $maxheight) = explode('x', my_strtolower($mybb->settings['ougc_feamem_maxavatardim']));
-				if($dimensions[0] > (int)$maxwidth || $dimensions[1] > (int)$maxheight)
-				{
-					require_once MYBB_ROOT.'inc/functions_image.php';
-					$scale = scale_image($dimensions[0], $dimensions[1], (int)$maxwidth, (int)$maxheight);
-				}
-			}
-
-			$avatar['width'] = (int)(!empty($scale['width']) ? $scale['width'] : $dimensions[0]);
-			$avatar['height'] = (int)(!empty($scale['height']) ? $scale['height'] : $dimensions[1]);
+			$avatar = format_avatar($user['avatar'], $user['avatardimensions'], $settings['maxavatardim']);
 
 			eval('$avatar = "'.$templates->get('ougcfeamem_avatar').'";');
 		}
@@ -697,20 +708,22 @@ function ougc_feamem_settings_change()
 		{
 			global $settings;
 
-			$gids = '';
-			if(isset($mybb->input['ougc_feamem_groups']) && is_array($mybb->input['ougc_feamem_groups']))
+			$rebuild = false;
+			if(($mybb->input['upsetting']['ougc_feamem_groups'] == 'custom' || $mybb->input['upsetting']['ougc_feamem_groups'] == 'all') && $settings['ougc_feamem_groups'] != -1)
 			{
-				$gids = implode(',', (array)array_filter(array_map('intval', $mybb->input['ougc_feamem_groups'])));
+				$rebuild = true;
 			}
-
-			$mybb->input['upsetting']['ougc_feamem_groups'] = $gids;
+			if(($mybb->input['upsetting']['ougc_feamem_groups'] == 'custom' || $mybb->input['upsetting']['ougc_feamem_groups'] == 'none') && $settings['ougc_feamem_groups'] != '')
+			{
+				$rebuild = true;
+			}
 
 			if(isset($mybb->input['ougc_feamem_reset']))
 			{
 				ougc_feamem_cache_update();
 				unset($mybb->input['ougc_feamem_reset']);
 			}
-			elseif($mybb->input['upsetting']['ougc_feamem_groups'] != $settings['ougc_feamem_groups'] || $mybb->input['upsetting']['ougc_feamem_uid'] != $settings['ougc_feamem_uid'] || $mybb->input['upsetting']['ougc_feamem_away'] != $settings['ougc_feamem_away'])
+			elseif($rebuild || $mybb->input['upsetting']['ougc_feamem_uid'] != $settings['ougc_feamem_uid'] || $mybb->input['upsetting']['ougc_feamem_away'] != $settings['ougc_feamem_away'])
 			{
 				ougc_feamem_cache_update();
 			}
@@ -810,20 +823,6 @@ function ougc_feamem_clean(&$user)
 	{
 		unset($user['wiki_permissions']);
 	}
-
-	if(empty($user['avatar']) || empty($user['avatardimensions']))
-	{
-		$user['avatar'] = $settings['ougc_feamem_avatar'];
-		$user['avatardimensions'] = $settings['ougc_feamem_avatardim'];
-	}
-
-	$user['username'] = htmlspecialchars_uni($user['username']);
-	$user['profilelink'] = get_profile_link($user['uid']);
-
-	if(!$user['displaygroup'])
-	{
-		$user['displaygroup'] = $user['usergroup'];
-	}
 }
 
 function ougc_feamem_formcontainer_output_row(&$args)
@@ -832,11 +831,6 @@ function ougc_feamem_formcontainer_output_row(&$args)
 	ougc_feamem_load_lang();
 
 	#static $unset_prefix = false;
-
-	if($args['row_options']['id'] == 'row_setting_ougc_feamem_groups')
-	{
-		$args['content'] = $form->generate_group_select('ougc_feamem_groups[]', explode(',', $settings['ougc_feamem_groups']), array('multiple' => true, 'size' => 5));
-	}
 
 	if($args['row_options']['id'] == 'row_setting_ougc_feamem_ignoredhistory')
 	{
@@ -976,7 +970,7 @@ function ougc_feamem_create_thread($user, $errors=array(), $tid=0)
 
 	global $db;
 
-	// Get the corrct thread author UID and USERNAME
+	// Get the correct thread author UID and USERNAME
 	if(my_strpos($sets['uid'], 'username:') !== false)
 	{
 		$username = explode(':', $sets['uid']);

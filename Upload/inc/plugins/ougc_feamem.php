@@ -289,7 +289,12 @@ function ougc_feamem_is_installed()
 {
 	global $cache;
 
-	return isset($cache->cache['ougc_feamem']);
+	if(!($plugins = $cache->read('ougc_plugins')))
+	{
+		return false;
+	}
+
+	return isset($plugins['feamem']);
 }
 
 // _uninstall function

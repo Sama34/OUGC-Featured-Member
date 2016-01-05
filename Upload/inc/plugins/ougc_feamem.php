@@ -92,6 +92,7 @@ function ougc_feamem_info()
 		'version'		=> '1.8',
 		'versioncode'	=> 1800,
 		'compatibility' => '18*',
+		'codename'		=> 'ougc_feamem',
 		'plv'			=> 12
 	);
 }
@@ -301,6 +302,7 @@ function ougc_feamem_is_installed()
 function ougc_feamem_uninstall()
 {
 	global $db, $cache, $lang, $PL;
+	ougc_feamem_load_pl();
 
 	$PL->settings_delete('ougc_feamem');
 	$PL->templates_delete('ougcfeamem');

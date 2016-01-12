@@ -37,7 +37,6 @@ defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT.'inc/plugins/plugi
 if(defined('IN_ADMINCP'))
 {
 	$plugins->add_hook('admin_config_settings_start', 'ougc_feamem_load_lang');
-	$plugins->add_hook('admin_style_templates_set', 'ougc_feamem_load_lang');
 	$plugins->add_hook('admin_config_settings_change', 'ougc_feamem_settings_change');
 
 	// Cache manager
@@ -89,9 +88,9 @@ function ougc_feamem_info()
 		'website'		=> 'http://omarg.me',
 		'author'		=> 'Omar G.',
 		'authorsite'	=> 'http://omarg.me',
-		'version'		=> '1.8',
-		'versioncode'	=> 1800,
-		'compatibility' => '18*',
+		'version'		=> '1.8.6',
+		'versioncode'	=> 1806,
+		'compatibility' => '1806',
 		'codename'		=> 'ougc_feamem',
 		'plv'			=> 12
 	);
@@ -157,8 +156,8 @@ function ougc_feamem_activate()
 		'thread_fid'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_thread_fid,
 			'description'	=> $lang->setting_ougc_feamem_thread_fid_desc,
-			'optionscode'	=> 'text',
-			'value'			=> '',
+			'optionscode'	=> 'forumselectsingle',
+			'value'			=> 2,
 		),
 		'thread_subject'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_thread_subject,
@@ -219,7 +218,7 @@ All users, please congratulate our new member of the day as well :)',
 		),*/
 	));
 	// Insert template/group
-	$PL->templates('ougcfeamem', '<lang:setting_group_ougc_feamem>', array(
+	$PL->templates('ougcfeamem', 'OUGC Featured Member', array(
 		''	=> '<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
 <tr>
 <td class="thead">
@@ -842,11 +841,6 @@ function ougc_feamem_formcontainer_output_row(&$args)
 	if($args['row_options']['id'] == 'row_setting_ougc_feamem_ignoredhistory')
 	{
 		$args['row_options']['id'] .= '" style="display: none;';
-	}
-
-	if($args['row_options']['id'] == 'row_setting_ougc_feamem_thread_fid')
-	{
-		$args['content'] = $form->generate_forum_select('upsetting[ougc_feamem_thread_fid]', (int)$settings['ougc_feamem_thread_fid']);
 	}
 
 	if($args['row_options']['id'] == 'row_setting_ougc_feamem_thread_prefix')

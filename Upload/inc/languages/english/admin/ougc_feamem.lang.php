@@ -43,7 +43,7 @@ $l['setting_ougc_feamem_away'] = 'Allow Away Users';
 $l['setting_ougc_feamem_away_desc'] = 'Whether to allow away users to be featured.';
 $l['setting_ougc_feamem_maxavatardim'] = 'Maximum Avatar Dimensions';
 $l['setting_ougc_feamem_maxavatardim_desc'] = 'Maximum Avatar Dimensions';
-$l['setting_ougc_feamem_ignorefeatured'] = 'Ignore Already Fetured';
+$l['setting_ougc_feamem_ignorefeatured'] = 'Ignore Already Featured';
 $l['setting_ougc_feamem_ignorefeatured_desc'] = 'Do you want to ignore already featured members when selecting a new one? <b style="color: red;">Beta Status</b>';
 $l['setting_ougc_feamem_createthread'] = 'Add Forum Thread';
 $l['setting_ougc_feamem_createthread_desc'] = 'Add a thread each time a member is selected as the featured member.';

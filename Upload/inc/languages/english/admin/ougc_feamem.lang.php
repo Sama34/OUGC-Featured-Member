@@ -2,16 +2,16 @@
 
 /***************************************************************************
  *
- *   OUGC Featured Member plugin (/inc/languages/english/admin/ougc_feamem.lang.php)
- *	 Author: Omar Gonzalez
- *   Copyright: © 2012 - 2014 Omar Gonzalez
- *   
- *   Website: http://omarg.me
+ *	OUGC Featured Member plugin (/inc/languages/english/admin/ougc_feamem.lang.php)
+ *	Author: Omar Gonzalez
+ *	Copyright: © 2012 - 2020 Omar Gonzalez
  *
- *   Shows a member information anywhere in the forum.
+ *	Website: https://ougc.network
+ *
+ *	Shows a member information anywhere in the forum.
  *
  ***************************************************************************
- 
+
 ****************************************************************************
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

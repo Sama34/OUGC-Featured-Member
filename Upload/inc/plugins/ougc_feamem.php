@@ -2,16 +2,16 @@
 
 /***************************************************************************
  *
- *   OUGC Featured Member plugin (/inc/plugins/ougc_feamem.php)
- *	 Author: Omar Gonzalez
- *   Copyright: © 2012 - 2014 Omar Gonzalez
- *   
- *   Website: http://omarg.me
+ *	OUGC Featured Member plugin (/inc/plugins/ougc_feamem.php)
+ *	Author: Omar Gonzalez
+ *	Copyright: © 2012 - 2020 Omar Gonzalez
  *
- *   Shows a member information anywhere in the forum.
+ *	Website: https://ougc.network
+ *
+ *	Shows a member information anywhere in the forum.
  *
  ***************************************************************************
- 
+
 ****************************************************************************
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -85,14 +85,14 @@ function ougc_feamem_info()
 	return array(
 		'name'			=> 'OUGC Featured Member',
 		'description'	=> $lang->setting_group_ougc_feamem_desc,
-		'website'		=> 'http://omarg.me',
+		'website'		=> 'https://ougc.network',
 		'author'		=> 'Omar G.',
-		'authorsite'	=> 'http://omarg.me',
-		'version'		=> '1.8.6',
-		'versioncode'	=> 1806,
-		'compatibility' => '1806',
+		'authorsite'	=> 'https://ougc.network',
+		'version'		=> '1.8.22',
+		'versioncode'	=> 1822,
+		'compatibility'	=> '18*',
 		'codename'		=> 'ougc_feamem',
-		'plv'			=> 12
+		'plv'			=> 13
 	);
 }
 
@@ -115,7 +115,7 @@ function ougc_feamem_activate()
 			'title'			=> $lang->setting_ougc_feamem_groups,
 			'description'	=> $lang->setting_ougc_feamem_groups_desc,
 			'optionscode'	=> 'groupselect',
-			'value'			=> '',
+			'value'			=> -1,
 		),
 		'uid'	=> array(
 			'title'			=> $lang->setting_ougc_feamem_uid,
